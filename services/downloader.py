@@ -68,22 +68,6 @@ def _looks_like_netscape_cookies(raw: str) -> bool:
 
 
 def _cookies_file(run_id: str) -> Optional[str]:
-    env_path = settings.runtime_cookies_path
-    if env_path.is_file():
-        raw = env_path.read_text(encoding="utf-8", errors="ignore")
-        ok = _looks_like_netscape_cookies(raw)
-        # region agent log
-        _agent_log(
-            run_id,
-            "H2",
-            "downloader.py:_cookies_file",
-            "env_cookies_checked",
-            {"path": str(env_path), "valid_netscape": ok},
-        )
-        # endregion
-        if ok:
-            return str(env_path)
-
     local_path = Path(__file__).parent.parent / "cookies.txt"
     if local_path.is_file():
         raw = local_path.read_text(encoding="utf-8", errors="ignore")
