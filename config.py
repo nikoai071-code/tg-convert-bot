@@ -34,6 +34,8 @@ class Settings:
     video_note_size: int
     video_note_max_seconds: int
     max_download_bytes: int
+    instagram_cookies: str
+    runtime_cookies_path: Path
 
 
 def get_settings() -> Settings:
@@ -49,6 +51,8 @@ def get_settings() -> Settings:
         video_note_size=_env_int("VIDEO_NOTE_SIZE", 640),
         video_note_max_seconds=_env_int("VIDEO_NOTE_MAX_SECONDS", 60),
         max_download_bytes=_env_int("MAX_DOWNLOAD_MB", 50) * 1024 * 1024,
+        instagram_cookies=os.getenv("INSTAGRAM_COOKIES", ""),
+        runtime_cookies_path=tmp_dir / "instagram_cookies.txt",
     )
 
 
