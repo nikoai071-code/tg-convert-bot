@@ -30,18 +30,37 @@ def _video_actions_keyboard() -> InlineKeyboardMarkup:
     )
 
 
+async def _offer_video_actions(message: Message, state: FSMContext, file_id: str) -> None:
+    await state.update_data(**{STATE_KEY_VIDEO_ID: file_id})
+    await message.answer(
+        "Что сделать с видео?",
+        reply_markup=_video_actions_keyboard(),
+    )
+
+
 @router.message(F.video)
 async def on_video_received(message: Message, state: FSMContext) -> None:
     if not message.video:
         return
     try:
-        await state.update_data(**{STATE_KEY_VIDEO_ID: message.video.file_id})
-        await message.answer(
-            "Что сделать с видео?",
-            reply_markup=_video_actions_keyboard(),
-        )
+        await _offer_video_actions(message, state, message.video.file_id)
     except Exception:
         logger.exception("Ошибка при подготовке действий для видео")
+        await message.answer("Не удалось обработать видео. Попробуйте ещё раз.")
+
+
+@router.message(F.document)
+async def on_video_as_document(message: Message, state: FSMContext) -> None:
+    doc = message.document
+    if not doc:
+        return
+    mime = (doc.mime_type or "").lower()
+    if not mime.startswith("video/"):
+        return
+    try:
+        await _offer_video_actions(message, state, doc.file_id)
+    except Exception:
+        logger.exception("Ошибка при подготовке действий для видео (документ)")
         await message.answer("Не удалось обработать видео. Попробуйте ещё раз.")
 
 

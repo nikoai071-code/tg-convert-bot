@@ -38,13 +38,25 @@ def _prepare_runtime_cookies() -> None:
 def _check_ffmpeg_available() -> None:
     log = logging.getLogger(__name__)
     ffmpeg_bin = os.environ.get("FFMPEG_BINARY") or shutil.which("ffmpeg") or "ffmpeg"
-    if os.path.isfile(ffmpeg_bin) and os.access(ffmpeg_bin, os.X_OK):
-        log.info("ffmpeg: %s", ffmpeg_bin)
-        return
-    if shutil.which(ffmpeg_bin):
-        log.info("ffmpeg в PATH: %s", ffmpeg_bin)
-        return
-    log.warning("ffmpeg не найден (укажите FFMPEG_BINARY или установите ffmpeg в PATH): %s", ffmpeg_bin)
+    ffprobe_bin = os.environ.get("FFPROBE_BINARY") or shutil.which("ffprobe") or "ffprobe"
+
+    def _ok(bin_name: str) -> bool:
+        if os.path.isfile(bin_name) and os.access(bin_name, os.X_OK):
+            return True
+        return shutil.which(bin_name) is not None
+
+    if _ok(ffmpeg_bin):
+        log.info("ffmpeg: %s", shutil.which(ffmpeg_bin) or ffmpeg_bin)
+    else:
+        log.warning(
+            "ffmpeg не найден (укажите FFMPEG_BINARY или установите ffmpeg; в nixpacks см. aptPkgs): %s",
+            ffmpeg_bin,
+        )
+
+    if _ok(ffprobe_bin):
+        log.info("ffprobe: %s", shutil.which(ffprobe_bin) or ffprobe_bin)
+    else:
+        log.warning("ffprobe не найден: %s", ffprobe_bin)
 
 
 async def run_bot() -> None:

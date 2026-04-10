@@ -1,6 +1,7 @@
-# Важно: "..." сохраняет пакеты провайдера (Python и т.д.). Без него только ffmpeg — образ может быть сломан.
+# "..." обязателен: иначе список пакетов провайдера затирается — Python/ffmpeg могут пропасть из образа.
 [phases.setup]
 nixPkgs = ["...", "ffmpeg"]
+aptPkgs = ["ffmpeg"]
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.12"

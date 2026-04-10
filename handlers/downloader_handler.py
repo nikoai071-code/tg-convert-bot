@@ -49,6 +49,19 @@ async def on_text_with_link(message: Message) -> None:
             await message.answer("Файл больше 50MB, не могу отправить в Telegram.")
         elif msg == "UNSUPPORTED_URL":
             await message.answer("Ссылка не поддерживается или видео недоступно.")
+        elif msg == "FFMPEG_FAILED":
+            await message.answer(
+                "Не удалось подготовить видео для Telegram (нужен ffmpeg на сервере). "
+                "Проверьте деплой на Railway (nixpacks: ffmpeg)."
+            )
+        elif msg == "LOGIN_REQUIRED":
+            await message.answer("Нужен вход в аккаунт или свежие cookies для этой ссылки.")
+        elif msg == "COOKIES_INVALID":
+            await message.answer(
+                "Файл cookies не в формате Netscape (как требует yt-dlp). "
+                "Экспортируйте cookies через расширение «Get cookies.txt LOCALLY» или "
+                "«cookies.txt», первая строка должна быть: # Netscape HTTP Cookie File"
+            )
         else:
             await message.answer("Не удалось скачать видео по ссылке.")
     except Exception:

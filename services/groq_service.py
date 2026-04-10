@@ -5,6 +5,19 @@ import aiohttp
 from config import settings
 
 
+def _audio_content_type(path: Path) -> str:
+    ext = path.suffix.lower()
+    if ext == ".mp3":
+        return "audio/mpeg"
+    if ext in (".m4a", ".aac"):
+        return "audio/mp4"
+    if ext in (".wav",):
+        return "audio/wav"
+    if ext in (".flac",):
+        return "audio/flac"
+    return "audio/ogg"
+
+
 async def transcribe_audio_with_groq(audio_path: Path) -> str:
     headers = {
         "Authorization": f"Bearer {settings.groq_api_key}",
@@ -15,7 +28,7 @@ async def transcribe_audio_with_groq(audio_path: Path) -> str:
         "file",
         audio_path.read_bytes(),
         filename=audio_path.name,
-        content_type="audio/ogg",
+        content_type=_audio_content_type(audio_path),
     )
 
     timeout = aiohttp.ClientTimeout(total=180)

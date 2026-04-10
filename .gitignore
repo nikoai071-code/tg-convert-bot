@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+*.mp4
+*.mov
+*.webm
+tmp/*
+!tmp/.gitkeep
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
