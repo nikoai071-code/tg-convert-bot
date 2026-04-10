@@ -1,2 +1,9 @@
+# Важно: "..." сохраняет пакеты провайдера (Python и т.д.). Без него только ffmpeg — образ может быть сломан.
 [phases.setup]
-nixPkgs = ["ffmpeg"]
+nixPkgs = ["...", "ffmpeg"]
+
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.12"
+
+[start]
+cmd = "python main.py"
