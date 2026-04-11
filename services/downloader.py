@@ -64,7 +64,7 @@ def _netscape_cookie_line_valid(line: str) -> bool:
     if len(parts) != 7:
         return False
     _domain, include_sub, _path, secure, expires, _name, _value = parts
-    if include_sub not in ("TRUE", "FALSE") or secure not in ("TRUE", "FALSE"):
+    if include_sub.upper() not in ("TRUE", "FALSE") or secure.upper() not in ("TRUE", "FALSE"):
         return False
     if expires and not re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", expires):
         return False
@@ -238,6 +238,14 @@ async def download_video_with_ytdlp(url: str, work_dir: str) -> str:
         "mp4",
         "--no-playlist",
         "--no-warnings",
+        "--retries",
+        "3",
+        "--fragment-retries",
+        "3",
+        "--socket-timeout",
+        "30",
+        "--add-headers",
+        "User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "-o",
         out_template,
         url,
@@ -272,7 +280,17 @@ async def download_video_with_ytdlp(url: str, work_dir: str) -> str:
             raise RuntimeError("COOKIES_INVALID")
         if "Unsupported URL" in last_err or "unsupported url" in last_err.lower():
             raise RuntimeError("UNSUPPORTED_URL")
-        if "login required" in last_err.lower() or "rate-limit" in last_err.lower():
+        low = last_err.lower()
+        if (
+            "login required" in low
+            or "rate-limit" in low
+            or "login_required" in low
+            or "checkpoint_required" in low
+            or "http error 401" in low
+            or "private video" in low
+            or "this content is not available" in low
+            or "you need to log in" in low
+        ):
             raise RuntimeError("LOGIN_REQUIRED")
         raise RuntimeError("DOWNLOAD_FAILED")
 

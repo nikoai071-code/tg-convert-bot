@@ -28,6 +28,10 @@ async def on_voice_or_audio(message: Message) -> None:
     if not file_id:
         return
 
+    if not settings.groq_api_key:
+        await message.answer("Функция распознавания речи не настроена (GROQ_API_KEY не задан).")
+        return
+
     status_msg = None
     work_dir = settings.tmp_dir / f"stt_{uuid.uuid4().hex}"
     try:

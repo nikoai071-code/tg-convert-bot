@@ -41,7 +41,13 @@ async def _run_ffmpeg(args: list[str], context: str) -> None:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    _, stderr = await proc.communicate()
+    try:
+        _, stderr = await asyncio.wait_for(proc.communicate(), timeout=300)
+    except asyncio.TimeoutError:
+        proc.kill()
+        await proc.communicate()
+        logger.error("[%s] ffmpeg завис (таймаут 300с)", context)
+        raise RuntimeError(f"ffmpeg таймаут: {context}")
     if proc.returncode != 0:
         err = (stderr or b"").decode(errors="replace")[:800]
         logger.error("[%s] ffmpeg rc=%s: %s", context, proc.returncode, err)
@@ -219,10 +225,14 @@ async def convert_video_to_voice(input_path: Path, output_path: Path) -> None:
         "-i",
         str(input_path),
         "-vn",
-        "-acodec",
+        "-c:a",
         "libopus",
         "-b:a",
         "64k",
+        "-ar",
+        "48000",
+        "-f",
+        "ogg",
         str(output_path),
     ]
     await _run_ffmpeg(cmd, "video_to_voice")

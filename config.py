@@ -44,7 +44,7 @@ def get_settings() -> Settings:
     tmp_dir.mkdir(parents=True, exist_ok=True)
     return Settings(
         bot_token=_require_env("BOT_TOKEN"),
-        groq_api_key=_require_env("GROQ_API_KEY"),
+        groq_api_key=os.getenv("GROQ_API_KEY", "").strip(),
         groq_whisper_model=os.getenv("GROQ_WHISPER_MODEL", "whisper-large-v3-turbo"),
         groq_transcription_url="https://api.groq.com/openai/v1/audio/transcriptions",
         tmp_dir=tmp_dir,

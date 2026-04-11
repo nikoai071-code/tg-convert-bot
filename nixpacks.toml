@@ -1,6 +1,6 @@
 # "..." сохраняет пакеты провайдера (Python и др.) — без него они затираются.
 [phases.setup]
-nixPkgs = ["...", "ffmpeg", "ffmpeg.lib"]
+nixPkgs = ["...", "ffmpeg"]
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.12"
